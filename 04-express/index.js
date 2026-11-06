@@ -1,5 +1,5 @@
 import express from 'express'
-import jobs from './jobs.json' with { type: 'json'}
+import jobs from './jobs.json' with { type: 'json' }
 
 
 const PORT = process.env.PORT ?? 1234
@@ -28,12 +28,11 @@ app.get('/get-jobs', (req, res) => {
     const { text, title, level, limit, technology, offset} = req.query
     let filteredJobs = jobs
 
-    if(text){
+    if (text){
         const searchTerm = text.toLowerCase()
-        filteredJobs = filteredJobs.filter(job => {
-            console.log(job)
-            job.descripcion.toLowerCase().includes(searchTerm)
-        })
+        filteredJobs = filteredJobs.filter(job =>            
+            job.titulo.toLowerCase().includes(searchTerm) || job.descripcion.toLowerCase().includes(searchTerm)
+       )
         
     }
     return res.json(filteredJobs)
