@@ -1,9 +1,11 @@
 import express from 'express'
 import jobs from './jobs.json' with { type: 'json' }
+import { DEFAULTS } from './config.js'
 
-
-const PORT = process.env.PORT ?? 1234
+const PORT = process.env.PORT ?? DEFAULTS.PORT
 const app = express()
+
+app.use(express.json()) //Middleware
 
 app.use((request, response, next) => {
     const timeString = new Date().toLocaleTimeString()
@@ -22,10 +24,10 @@ app.get('/health', (request, response) => {
         uptime: process.uptime()
     })
 })
-
-app.get('/get-jobs', (req, res) => {
+//
+app.get('/jobs', (req, res) => {
     console.log(req.query)
-    const { text, title, level, limit, technology, offset} = req.query
+    const { text, title, level, limit = DEFAULTS.LIMIT_PAGINATION, technology, offset = DEFAULTS.LIMIT_OFFSET} = req.query
     let filteredJobs = jobs
 
     if (text){
@@ -35,35 +37,53 @@ app.get('/get-jobs', (req, res) => {
        )
         
     }
-    return res.json(filteredJobs)
+
+    if (technology) {
+        filteredJobs = filteredJobs.filter(job =>
+            job.tecnologias.includes(technology)
+        )
+    }
+
+    const limitNumber = Number(limit)
+    const offsetNumber = Number(offset)
+
+    const paginatedJobs = filteredJobs.slice(offsetNumber, offsetNumber + limitNumber)
+
+    return res.json(paginatedJobs)
 })
 
-app.get('/get-single-job/:id', (req, res) => {
+app.get('/jobs/:id', (req, res) => {
     const { id } = req.params
-    const idNumber = Number(id)
+    
+    const job = jobs.find(job => job.id === id)
 
-    return res.json({
-        job: { id: idNumber, title: `Job with id ${id}` }
-    })
+    if (!job) {
+        return res.status(404).json({ error: 'Job not found' })
+    }
 
-}
-)
+    return res.json(job)
+})
 
-app.get('/ab{c}de', (req, res) => {
-    return res.send(`abcde o abde`)
-}
-)
+app.post('/jobs', (req, res) => {
+    const { titulo, empresa, ubicacion, data } = req.body
 
-app.get('/bb*bb', (req, res) => {
-    return res.send(`bb*bb`)
-}
-)
+    const newJob = {
+        id: crypto.randomUUID(),
+        titulo,
+        empresa,
+        ubicacion,
+        data
+    }
 
-app.get('/file/*filename', (req, res) => {
-    return res.send(`file/*`)
-}
-)
+    jobs.push(newJob)
 
+    return res.status(201).json(newJob)
+
+})
+
+app.put('/jobs/:id', (req, res)=> {
+
+})
 
 app.listen(PORT, () => {
     console.log(`Servidor levantando en http://localhost:${PORT}`)
