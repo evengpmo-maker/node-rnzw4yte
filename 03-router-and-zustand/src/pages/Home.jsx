@@ -21,7 +21,7 @@ export default function HomePage () {
       <section>
         <img src="./background.webp" width="200" />
 
-        <h1>Encuentra el trabajo de tus sueños</h1>
+        <h1>Texto de Prueba</h1>
 
         <p>Únete a la comunidad más grande de desarrolladores y encuentra tu próxima oportunidad.</p>
 

@@ -65,7 +65,7 @@ export function SearchFormSection ({ initialFilters, onTextFilter, onSearch, ini
 
   return (
     <section className="jobs-search">
-      <h1>Encuentra tu próximo trabajo</h1>
+      <h1>Texto de Prueba</h1>
       <p>Explora miles de oportunidades en el sector tecnológico.</p>
 
       <form onChange={handleSubmit} id="empleos-search-form" role="search">
