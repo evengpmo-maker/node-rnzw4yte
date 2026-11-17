@@ -1,9 +1,28 @@
 import express from 'express'
 import jobs from './jobs.json' with { type: 'json' }
 import { DEFAULTS } from './config.js'
+import cors from 'cors'
 
 const PORT = process.env.PORT ?? DEFAULTS.PORT
+
 const app = express()
+
+const ACCEPTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:8888'
+]
+
+app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (ACCEPTED_ORIGINS.includes(origin)) {
+          return callback(null, true)
+        }
+  
+        return callback(new Error('Origen no permitido'))
+      }
+    })
+  )
 
 app.use(express.json()) //Middleware
 
@@ -25,32 +44,33 @@ app.get('/health', (request, response) => {
     })
 })
 //
+
 app.get('/jobs', (req, res) => {
-    console.log(req.query)
-    const { text, title, level, limit = DEFAULTS.LIMIT_PAGINATION, technology, offset = DEFAULTS.LIMIT_OFFSET} = req.query
+    
+    const { text, title, level, limit = DEFAULTS.LIMIT_PAGINATION, technology, offset = DEFAULTS.LIMIT_OFFSET } = req.query
+  
     let filteredJobs = jobs
-
-    if (text){
-        const searchTerm = text.toLowerCase()
-        filteredJobs = filteredJobs.filter(job =>            
-            job.titulo.toLowerCase().includes(searchTerm) || job.descripcion.toLowerCase().includes(searchTerm)
-       )
-        
+    
+    if (text) {
+      const searchTerm = text.toLowerCase()
+      filteredJobs = filteredJobs.filter(job =>
+        job.titulo.toLowerCase().includes(searchTerm) || job.descripcion.toLowerCase().includes(searchTerm)
+      )
     }
-
+  
     if (technology) {
-        filteredJobs = filteredJobs.filter(job =>
-            job.tecnologias.includes(technology)
-        )
+      filteredJobs = filteredJobs.filter(job =>
+        job.tecnologias.includes(technology)
+      )
     }
-
-    const limitNumber = Number(limit)
+  
+    const limitNumber = Number(limit) 
     const offsetNumber = Number(offset)
-
+  
     const paginatedJobs = filteredJobs.slice(offsetNumber, offsetNumber + limitNumber)
-
-    return res.json(paginatedJobs)
-})
+  
+    return res.json({ data: paginatedJobs, total: filteredJobs.length, limit: limitNumber, offset: offsetNumber })
+  })
 
 app.get('/jobs/:id', (req, res) => {
     const { id } = req.params
