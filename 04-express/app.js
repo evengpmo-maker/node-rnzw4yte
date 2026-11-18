@@ -5,6 +5,7 @@ import { DEFAULTS } from './config.js'
 
 const PORT = process.env.PORT ?? DEFAULTS.PORT
 const app = express()
+//prueba
 
 app.use(corsMiddleware())
 app.use(express.json())
