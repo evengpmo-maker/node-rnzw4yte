@@ -1,4 +1,4 @@
-import jobs from './jobs.json' with { type: 'json' }
+import jobs from '../jobs.json' with { type: 'json' }
 
 export class JobModel {
     static async getAll({ text, title, level, limit = 10, technology, offset = 0}) {
@@ -25,7 +25,7 @@ export class JobModel {
         return paginatedJobs
     }
 
-    static async getId(id) {
+    static async getById(id) {
         const job = jobs.find(job => job.id === id)
         return job
     }

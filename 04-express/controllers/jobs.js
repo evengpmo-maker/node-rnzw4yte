@@ -5,7 +5,10 @@ export class JobController {
   static async getAll(req, res) {
     const { text, title, level, limit = DEFAULTS.LIMIT_PAGINATION, technology, offset = DEFAULTS.LIMIT_OFFSET } = req.query
 
-    const paginatedJobs = await JobModel.getAll({ text, title, level, limit, technology, offset })
+    const jobs = await JobModel.getAll({ text, title, level, limit, technology, offset })
+    
+    const limitNumber = Number(limit) 
+    const offsetNumber = Number(offset)
     
     return res.json({ data: jobs, total: jobs.length, limit: limitNumber, offset: offsetNumber })
   }
